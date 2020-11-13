@@ -575,7 +575,7 @@ U 1 1 5FBFF630
 P 4000 2600
 F 0 "J2" H 3918 2175 50  0000 C CNN
 F 1 "Conn_01x04" H 3918 2266 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical" H 4000 2600 50  0001 C CNN
+F 2 "Connector_PinHeader_1.27mm:PinHeader_1x04_P1.27mm_Vertical" H 4000 2600 50  0001 C CNN
 F 3 "~" H 4000 2600 50  0001 C CNN
 	1    4000 2600
 	-1   0    0    1   
@@ -586,7 +586,7 @@ U 1 1 5FC0ED35
 P 2100 2000
 F 0 "J1" H 2018 1675 50  0000 C CNN
 F 1 "Conn_01x02" H 2018 1766 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 2100 2000 50  0001 C CNN
+F 2 "Connector_PinHeader_1.27mm:PinHeader_1x02_P1.27mm_Vertical" H 2100 2000 50  0001 C CNN
 F 3 "~" H 2100 2000 50  0001 C CNN
 	1    2100 2000
 	-1   0    0    1   
@@ -634,7 +634,7 @@ U 1 1 5FC34471
 P 4050 1850
 F 0 "J3" H 3968 1525 50  0000 C CNN
 F 1 "Conn_01x02" H 3968 1616 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 4050 1850 50  0001 C CNN
+F 2 "Connector_PinHeader_1.27mm:PinHeader_1x02_P1.27mm_Vertical" H 4050 1850 50  0001 C CNN
 F 3 "~" H 4050 1850 50  0001 C CNN
 	1    4050 1850
 	-1   0    0    1   
@@ -655,29 +655,16 @@ Connection ~ 8000 4050
 $Comp
 L Device:R R7
 U 1 1 5FAF1606
-P 3200 2200
-F 0 "R7" H 3130 2154 50  0000 R CNN
-F 1 "580" H 3130 2245 50  0000 R CNN
-F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 3130 2200 50  0001 C CNN
-F 3 "~" H 3200 2200 50  0001 C CNN
-	1    3200 2200
-	-1   0    0    1   
-$EndComp
-$Comp
-L Device:LED D5
-U 1 1 5FAF1F7A
 P 3200 1850
-F 0 "D5" V 3147 1930 50  0000 L CNN
-F 1 "gn" V 3238 1930 50  0000 L CNN
-F 2 "LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder" H 3200 1850 50  0001 C CNN
+F 0 "R7" H 3130 1804 50  0000 R CNN
+F 1 "580" H 3130 1895 50  0000 R CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 3130 1850 50  0001 C CNN
 F 3 "~" H 3200 1850 50  0001 C CNN
 	1    3200 1850
-	0    1    1    0   
+	-1   0    0    1   
 $EndComp
 Wire Wire Line
 	3200 2350 3200 2400
-Wire Wire Line
-	3200 2000 3200 2050
 Wire Wire Line
 	3200 1650 3200 1700
 Wire Wire Line
@@ -755,4 +742,17 @@ $EndComp
 Wire Wire Line
 	8600 2500 8600 2550
 Connection ~ 8600 2550
+$Comp
+L Device:LED D5
+U 1 1 5FAF1F7A
+P 3200 2200
+F 0 "D5" V 3147 2280 50  0000 L CNN
+F 1 "gn" V 3238 2280 50  0000 L CNN
+F 2 "LED_SMD:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder" H 3200 2200 50  0001 C CNN
+F 3 "~" H 3200 2200 50  0001 C CNN
+	1    3200 2200
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	3200 2000 3200 2050
 $EndSCHEMATC
