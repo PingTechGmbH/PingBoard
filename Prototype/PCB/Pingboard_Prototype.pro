@@ -1,4 +1,4 @@
-update=Thu Nov 12 18:18:07 2020
+update=Fri Nov 13 13:40:40 2020
 version=1
 last_client=kicad
 [general]
@@ -32,15 +32,15 @@ AllowMicroVias=0
 AllowBlindVias=0
 RequireCourtyardDefinitions=0
 ProhibitOverlappingCourtyards=1
-MinTrackWidth=0.2
-MinViaDiameter=0.4
+MinTrackWidth=0.1524
+MinViaDiameter=0.3302
 MinViaDrill=0.3
 MinMicroViaDiameter=0.2
 MinMicroViaDrill=0.09999999999999999
 MinHoleToHole=0.25
-TrackWidth1=0.25
-ViaDiameter1=0.8
-ViaDrill1=0.4
+TrackWidth1=0.1524
+ViaDiameter1=0.6858
+ViaDrill1=0.3302
 dPairWidth1=0.2
 dPairGap1=0.25
 dPairViaGap1=0.25
@@ -50,7 +50,7 @@ SilkTextSizeH=1
 SilkTextSizeThickness=0.15
 SilkTextItalic=0
 SilkTextUpright=1
-CopperLineWidth=0.2
+CopperLineWidth=0.1524
 CopperTextSizeV=1.5
 CopperTextSizeH=1.5
 CopperTextThickness=0.3
@@ -67,7 +67,7 @@ OthersTextUpright=1
 SolderMaskClearance=0
 SolderMaskMinWidth=0
 SolderPasteClearance=0
-SolderPasteRatio=0
+SolderPasteRatio=-0
 [pcbnew/Layer.F.Cu]
 Name=F.Cu
 Type=0
@@ -233,14 +233,25 @@ Enabled=1
 [pcbnew/Layer.F.Fab]
 Enabled=1
 [pcbnew/Layer.Rescue]
-Enabled=1
+Enabled=0
 [pcbnew/Netclasses]
 [pcbnew/Netclasses/Default]
 Name=Default
-Clearance=0.2
-TrackWidth=0.25
-ViaDiameter=0.8
-ViaDrill=0.4
+Clearance=0.1524
+TrackWidth=0.1524
+ViaDiameter=0.6858
+ViaDrill=0.3302
+uViaDiameter=0.3
+uViaDrill=0.1
+dPairWidth=0.2
+dPairGap=0.25
+dPairViaGap=0.25
+[pcbnew/Netclasses/1]
+Name=VCC
+Clearance=0.2032
+TrackWidth=0.3048
+ViaDiameter=0.6858
+ViaDrill=0.3302
 uViaDiameter=0.3
 uViaDrill=0.1
 dPairWidth=0.2
