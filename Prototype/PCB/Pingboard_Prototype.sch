@@ -198,22 +198,14 @@ Wire Wire Line
 $Comp
 L Device:R R5
 U 1 1 5FB26FE3
-P 7550 2050
-F 0 "R5" H 7480 2004 50  0000 R CNN
-F 1 "520" H 7480 2095 50  0000 R CNN
-F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 7480 2050 50  0001 C CNN
-F 3 "~" H 7550 2050 50  0001 C CNN
-	1    7550 2050
-	-1   0    0    1   
+P 7750 2300
+F 0 "R5" V 7550 2300 50  0000 R CNN
+F 1 "520" V 7650 2350 50  0000 R CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 7680 2300 50  0001 C CNN
+F 3 "~" H 7750 2300 50  0001 C CNN
+	1    7750 2300
+	0    1    1    0   
 $EndComp
-Wire Wire Line
-	8100 2300 7550 2300
-Wire Wire Line
-	7550 2300 7550 2200
-Wire Wire Line
-	7550 1900 7550 1150
-Wire Wire Line
-	7550 1150 8000 1150
 Text GLabel 7900 1700 0    39   BiDi ~ 0
 SCL
 Text GLabel 7900 1800 0    39   BiDi ~ 0
@@ -437,22 +429,14 @@ Connection ~ 8000 4350
 $Comp
 L Device:R R6
 U 1 1 5FBB8151
-P 7550 4200
-F 0 "R6" H 7480 4154 50  0000 R CNN
-F 1 "520" H 7480 4245 50  0000 R CNN
-F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 7480 4200 50  0001 C CNN
-F 3 "~" H 7550 4200 50  0001 C CNN
-	1    7550 4200
-	-1   0    0    1   
+P 7700 4450
+F 0 "R6" V 7500 4450 50  0000 R CNN
+F 1 "520" V 7600 4500 50  0000 R CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder" V 7630 4450 50  0001 C CNN
+F 3 "~" H 7700 4450 50  0001 C CNN
+	1    7700 4450
+	0    1    1    0   
 $EndComp
-Wire Wire Line
-	8100 4450 7550 4450
-Wire Wire Line
-	7550 4450 7550 4350
-Wire Wire Line
-	7550 4050 7550 3300
-Wire Wire Line
-	7550 3300 8000 3300
 Text GLabel 7900 3850 0    39   BiDi ~ 0
 SCL
 Text GLabel 7900 3950 0    39   BiDi ~ 0
@@ -602,21 +586,15 @@ Connection ~ 2400 5350
 Wire Wire Line
 	7200 3850 7200 3300
 Wire Wire Line
-	7200 3300 7550 3300
-Connection ~ 7550 3300
-Wire Wire Line
 	7200 4150 7200 4700
 Wire Wire Line
-	7200 4700 8000 4700
+	7200 4700 7550 4700
 Wire Wire Line
 	7200 1700 7200 1150
 Wire Wire Line
-	7200 1150 7550 1150
-Connection ~ 7550 1150
-Wire Wire Line
 	7200 2000 7200 2550
 Wire Wire Line
-	7200 2550 8000 2550
+	7200 2550 7550 2550
 Wire Wire Line
 	8600 2550 8600 2650
 $Comp
@@ -815,4 +793,24 @@ F 3 "" H 2700 1350 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	2700 1350 2700 1400
+Wire Wire Line
+	7200 1150 8000 1150
+Connection ~ 7550 2550
+Wire Wire Line
+	7550 2550 8000 2550
+Wire Wire Line
+	8100 2300 7900 2300
+Wire Wire Line
+	7600 2300 7550 2300
+Wire Wire Line
+	7550 2300 7550 2550
+Wire Wire Line
+	7200 3300 8000 3300
+Wire Wire Line
+	7550 4450 7550 4700
+Connection ~ 7550 4700
+Wire Wire Line
+	7550 4700 8000 4700
+Wire Wire Line
+	7850 4450 8100 4450
 $EndSCHEMATC
