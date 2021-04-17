@@ -11,7 +11,7 @@ TLC59108 led2(LED2_I2C_ADDR);
 
 static byte BTN[4] = {10, 16, 14, 15};
 
-#define BUTTON_DEBOUNCE_DELAY   20   // [ms]
+#define BUTTON_DEBOUNCE_DELAY   50   // [ms]
 
 static InputDebounce btn1;
 static InputDebounce btn2;
