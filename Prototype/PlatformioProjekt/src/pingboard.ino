@@ -1,5 +1,6 @@
 #include "TLC59108.h"
 #include "Keyboard.h"
+#include "InputDebounce.h"
 
 #define HW_RESET_PIN 9
 #define LED1_I2C_ADDR 0x41
@@ -10,6 +11,13 @@ TLC59108 led2(LED2_I2C_ADDR);
 
 static byte BTN[4] = {10, 16, 14, 15};
 
+#define BUTTON_DEBOUNCE_DELAY   50   // [ms]
+
+static InputDebounce btn1;
+static InputDebounce btn2;
+static InputDebounce btn3;
+static InputDebounce btn4;
+
 static int KEY_MODI[4] = {KEY_LEFT_GUI,
                           KEY_LEFT_GUI,
                           KEY_LEFT_GUI,
@@ -19,7 +27,6 @@ static int KEY_SPEC[4] = {KEY_F9,
                           KEY_F10,
                           KEY_F11,
                           KEY_F12};
-
 
 // 0 - K1 RED
 // 1 - K1 GREEN
@@ -53,8 +60,6 @@ void bsColor(byte sw, bool state, byte r, byte g, byte b) {
     swColor(sw, 0, 0, 0);
 }
 
-static bool button_state[4] = {0, 0, 0, 0};
-
 // Serial Buffer Format is
 // SRRRGGGBBBn
 // all digits as ASCII digit
@@ -68,6 +73,24 @@ static bool button_state[4] = {0, 0, 0, 0};
 static char serialBuffer[SERIAL_BUFFER_SIZE];
 static int serialBufferPos = 0;
 
+void button_pressed_callback(uint8_t pinIn) { 
+  for (int i = 0; i < 4; i++)
+    if (BTN[i] == pinIn) 
+      trigger_keypress(i);
+}
+
+void trigger_keypress(int idx) {
+  if (KEY_MODI[idx])
+    Keyboard.press(KEY_MODI[idx]);
+
+  if (KEY_SPEC[idx])
+    Keyboard.press(KEY_SPEC[idx]);
+
+  delay(5);
+ 
+  Keyboard.releaseAll();
+}
+
 void setup() {
   // LED setup
   Wire.begin();
@@ -76,12 +99,19 @@ void setup() {
   led2.init();
   led2.setLedOutputMode(TLC59108::LED_MODE::PWM_IND);
 
-  // BUTTON setup
-  for (int i = 0; i < 4; i++)
-    pinMode(BTN[i], INPUT);
-
   // KEYBOARD setup
   Keyboard.begin();
+
+  // DEBOUNCE setup
+  btn1.registerCallbacks(button_pressed_callback, NULL, NULL, NULL);
+  btn2.registerCallbacks(button_pressed_callback, NULL, NULL, NULL);
+  btn3.registerCallbacks(button_pressed_callback, NULL, NULL, NULL);
+  btn4.registerCallbacks(button_pressed_callback, NULL, NULL, NULL);
+
+  btn1.setup(BTN[0], BUTTON_DEBOUNCE_DELAY, InputDebounce::PIM_EXT_PULL_DOWN_RES);
+  btn2.setup(BTN[1], BUTTON_DEBOUNCE_DELAY, InputDebounce::PIM_EXT_PULL_DOWN_RES);
+  btn3.setup(BTN[2], BUTTON_DEBOUNCE_DELAY, InputDebounce::PIM_EXT_PULL_DOWN_RES);
+  btn4.setup(BTN[3], BUTTON_DEBOUNCE_DELAY, InputDebounce::PIM_EXT_PULL_DOWN_RES);
 }
 
 int n(char* c) {
@@ -129,32 +159,20 @@ failed:
 }
 
 void loop(){
-  // check for key press
-  // and initiate button press if key has been pressed down
-  for (int i = 0; i < 4; i++) {
-    bool bs = digitalRead(BTN[i]);
+  // process buttons
+  unsigned long now = millis();
 
-    if (bs && !button_state[i]) {
-      if (KEY_MODI[i])
-        Keyboard.press(KEY_MODI[i]);
-
-      if (KEY_SPEC[i])
-        Keyboard.press(KEY_SPEC[i]);
-
-      delay(50);
-      Keyboard.releaseAll();
-    }
-
-    button_state[i] = bs;
-  }
+  btn1.process(now);
+  btn2.process(now);
+  btn3.process(now);
+  btn4.process(now);
 
   checkSerial();
 
-  delay(10);
+  delay(1);
 
 //  bsColor(1, button_state[0], 95, 0, 0);
 //  bsColor(2, button_state[1], 24, 197, 110);
 //  bsColor(3, button_state[2], 25, 75, 255);
 //  bsColor(4, button_state[3], 156, 131, 7);
 }
-
