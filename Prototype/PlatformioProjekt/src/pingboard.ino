@@ -60,14 +60,27 @@ void bsColor(byte sw, bool state, byte r, byte g, byte b) {
     swColor(sw, 0, 0, 0);
 }
 
-// Serial Buffer Format is
-// SRRRGGGBBBn
-// all digits as ASCII digit
-// S switch number 1 to 4
-// RRR three digit decimal red   0 - 255
-// GGG three digit decimal green 0 - 255
-// BBB three digit decimal blue  0 - 255
-// n newline
+/* ** Serial Buffer Format **
+
+  Serial buffer commands consist of one command per line, 
+  
+  where each command has the form
+  
+  	<command>[ <arg 1> [<arg 2> [...]]]
+  
+  i.e. Commands and arguments are separated by exactly one space char (0x20)
+  
+    ** Available Commands **
+    
+  1) COL: Set Color
+  
+  	COL <switch> <red> <green> <blue>
+  	
+  	with 
+  	  <switch> as a number between 1 and 4 denoting the switch
+  	  <red> <green> <blue> as three digit decimal color values 0 - 255
+*/
+
 
 #define SERIAL_BUF_SIZE 10
 static char serialBuffer[SERIAL_BUF_SIZE];
