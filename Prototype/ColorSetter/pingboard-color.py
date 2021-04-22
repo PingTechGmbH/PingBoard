@@ -22,7 +22,7 @@ def main():
     green = int(sys.argv[3])
     blue = int(sys.argv[4])
 
-    cmd_string = "{0:1d}{1:03d}{2:03d}{3:03d}\n".format(sw, red, green, blue)
+    cmd_string = "COL {0:1d} {1:03d} {2:03d} {3:03d}\n".format(sw, red, green, blue)
 
     port = find_arduino()
 
