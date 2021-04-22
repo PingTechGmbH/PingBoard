@@ -69,8 +69,8 @@ void bsColor(byte sw, bool state, byte r, byte g, byte b) {
 // BBB three digit decimal blue  0 - 255
 // n newline
 
-#define SERIAL_BUFFER_SIZE 10
-static char serialBuffer[SERIAL_BUFFER_SIZE];
+#define SERIAL_BUF_SIZE 10
+static char serialBuffer[SERIAL_BUF_SIZE];
 static int serialBufferPos = 0;
 
 void button_pressed_callback(uint8_t pinIn) { 
@@ -125,7 +125,7 @@ int nnn(char* c) {
 void checkSerial() {
   if (Serial.available()) {
     char ch = Serial.read();
-    if ((ch != '\n') && (serialBufferPos < SERIAL_BUFFER_SIZE)) {
+    if ((ch != '\n') && (serialBufferPos < SERIAL_BUF_SIZE)) {
       serialBuffer[serialBufferPos++] = ch;
     } else {
       if (serialBufferPos < 10) {
