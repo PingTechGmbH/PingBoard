@@ -86,6 +86,43 @@ void bsColor(byte sw, bool state, byte r, byte g, byte b) {
 static char serialBuffer[SERIAL_BUF_SIZE];
 static int serialBufferPos = 0;
 
+void checkSerial() {
+  if (Serial.available()) {
+    char ch = Serial.read();
+    if ((ch != '\n') && (serialBufferPos < SERIAL_BUF_SIZE)) {
+      serialBuffer[serialBufferPos++] = ch;
+    } else {
+      if (serialBufferPos < 10) {
+          Serial.write("Serial Buffer expects 10 digits (SRRRGGGBBB).\n");
+          goto failed;
+      }
+
+      byte sw = n(serialBuffer+0);
+
+      if ((sw < 1) || (sw > 4)) {
+        Serial.write("Switch number must be between 1 and 4.\n");
+        goto failed;
+      }
+
+      byte r = nnn(serialBuffer+1);
+      byte g = nnn(serialBuffer+4);
+      byte b = nnn(serialBuffer+7);
+
+      swColor(sw, r, g, b);
+
+      serialBufferPos = 0;
+      Serial.write("OK\n");
+    }
+  }
+
+  return;
+
+failed:
+  Serial.write("Error processing serial buffer content!\n");
+  serialBufferPos = 0;
+}
+
+
 void button_pressed_callback(uint8_t pinIn) { 
   for (int i = 0; i < 4; i++)
     if (BTN[i] == pinIn) 
@@ -133,42 +170,6 @@ int n(char* c) {
 
 int nnn(char* c) {
   return n(c+0) * 100 + n(c+1) * 10 + n(c+2);
-}
-
-void checkSerial() {
-  if (Serial.available()) {
-    char ch = Serial.read();
-    if ((ch != '\n') && (serialBufferPos < SERIAL_BUF_SIZE)) {
-      serialBuffer[serialBufferPos++] = ch;
-    } else {
-      if (serialBufferPos < 10) {
-          Serial.write("Serial Buffer expects 10 digits (SRRRGGGBBB).\n");
-          goto failed;
-      }
-
-      byte sw = n(serialBuffer+0);
-
-      if ((sw < 1) || (sw > 4)) {
-        Serial.write("Switch number must be between 1 and 4.\n");
-        goto failed;
-      }
-
-      byte r = nnn(serialBuffer+1);
-      byte g = nnn(serialBuffer+4);
-      byte b = nnn(serialBuffer+7);
-
-      swColor(sw, r, g, b);
-
-      serialBufferPos = 0;
-      Serial.write("OK\n");
-    }
-  }
-
-  return;
-
-failed:
-  Serial.write("Error processing serial buffer content!\n");
-  serialBufferPos = 0;
 }
 
 void loop(){
