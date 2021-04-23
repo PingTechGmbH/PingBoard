@@ -60,18 +60,111 @@ void bsColor(byte sw, bool state, byte r, byte g, byte b) {
     swColor(sw, 0, 0, 0);
 }
 
-// Serial Buffer Format is
-// SRRRGGGBBBn
-// all digits as ASCII digit
-// S switch number 1 to 4
-// RRR three digit decimal red   0 - 255
-// GGG three digit decimal green 0 - 255
-// BBB three digit decimal blue  0 - 255
-// n newline
+/* ** Serial Buffer Format **
 
-#define SERIAL_BUFFER_SIZE 10
-static char serialBuffer[SERIAL_BUFFER_SIZE];
+  Serial buffer commands consist of one command per line, 
+  
+  where each command has the form
+  
+  	<command>[ <arg 1> [<arg 2> [...]]]
+  
+  i.e. Commands and arguments are separated by exactly one space char (0x20)
+  
+    ** Available Commands **
+    
+  1) COL: Set Color
+  
+  	COL <switch> <red> <green> <blue>
+  	
+  	with 
+  	  <switch> as a number between 1 and 4 denoting the switch
+  	  <red> <green> <blue> as three digit decimal color values 0 - 255
+*/
+
+
+#define SERIAL_BUF_SIZE 64
+static char serialBuffer[SERIAL_BUF_SIZE];
 static int serialBufferPos = 0;
+
+#define SERIAL_MAX_ARGS 10
+static int serialArgIdx[SERIAL_MAX_ARGS];
+static int numArgs = 0;
+
+void checkSerial() {
+  if (Serial.available()) {
+    char ch = Serial.read();
+    if ((ch != '\n') && (serialBufferPos < SERIAL_BUF_SIZE)) {
+      serialBuffer[serialBufferPos++] = ch;
+    } else {
+      serialBuffer[serialBufferPos] = '\0';
+      
+      parseSerialBuffer();
+      processSerialCommand();
+      
+      serialBufferPos = 0;
+   }
+  }
+
+  return;
+}
+
+void parseSerialBuffer() {
+  // Replace spaces with string delimiters, and store argument indexes.
+  // Also counts the arguments.
+  
+  numArgs = 0;
+
+  for (int pos = 0;
+       (serialBuffer[pos] != '\n') && (pos < SERIAL_BUF_SIZE);
+       pos++) {
+    if (serialBuffer[pos] == ' ') {
+      // Mark end of argument string
+      serialBuffer[pos] = '\0';
+
+      if (numArgs < SERIAL_MAX_ARGS) {
+        serialArgIdx[numArgs] = pos+1;
+        ++numArgs;
+      }
+    }
+  } 
+}
+
+char* getSerialArg(int idx) {
+  if (idx >= SERIAL_MAX_ARGS) 
+    return NULL;
+
+  return serialBuffer+serialArgIdx[idx];
+}
+
+void processSerialCommand() {
+  if (strcmp("COL\0", serialBuffer) == 0)
+    processCOL(); 
+  
+  else
+    Serial.write("Unknown command!\n")  ;
+}
+
+void processCOL() {
+  if (numArgs != 4) {
+    Serial.write("COL requires 4 arguments: <switch> <red> <green> <blue>!\n");
+    return;
+  }
+
+  byte sw = n(getSerialArg(0));
+
+  if ((sw < 1) || (sw > 4)) {
+    Serial.write("Switch number must be between 1 and 4.\n");
+    return;
+  }
+
+  byte r = nnn(getSerialArg(1));
+  byte g = nnn(getSerialArg(2));
+  byte b = nnn(getSerialArg(3));
+
+  swColor(sw, r, g, b);
+
+  Serial.write("OK\n");
+}
 
 void button_pressed_callback(uint8_t pinIn) { 
   for (int i = 0; i < 4; i++)
@@ -120,42 +213,6 @@ int n(char* c) {
 
 int nnn(char* c) {
   return n(c+0) * 100 + n(c+1) * 10 + n(c+2);
-}
-
-void checkSerial() {
-  if (Serial.available()) {
-    char ch = Serial.read();
-    if ((ch != '\n') && (serialBufferPos < SERIAL_BUFFER_SIZE)) {
-      serialBuffer[serialBufferPos++] = ch;
-    } else {
-      if (serialBufferPos < 10) {
-          Serial.write("Serial Buffer expects 10 digits (SRRRGGGBBB).\n");
-          goto failed;
-      }
-
-      byte sw = n(serialBuffer+0);
-
-      if ((sw < 1) || (sw > 4)) {
-        Serial.write("Switch number must be between 1 and 4.\n");
-        goto failed;
-      }
-
-      byte r = nnn(serialBuffer+1);
-      byte g = nnn(serialBuffer+4);
-      byte b = nnn(serialBuffer+7);
-
-      swColor(sw, r, g, b);
-
-      serialBufferPos = 0;
-      Serial.write("OK\n");
-    }
-  }
-
-  return;
-
-failed:
-  Serial.write("Error processing serial buffer content!\n");
-  serialBufferPos = 0;
 }
 
 void loop(){
