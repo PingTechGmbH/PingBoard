@@ -118,6 +118,7 @@ void parseSerialBuffer() {
        (serialBuffer[pos] != '\n') && (pos < SERIAL_BUF_SIZE);
        pos++) {
     if (serialBuffer[pos] == ' ') {
+      // Mark end of argument string
       serialBuffer[pos] = '\0';
 
       if (numArgs < SERIAL_MAX_ARGS) {
