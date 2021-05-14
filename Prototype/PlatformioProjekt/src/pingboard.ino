@@ -60,6 +60,18 @@ void bsColor(byte sw, bool state, byte r, byte g, byte b) {
     swColor(sw, 0, 0, 0);
 }
 
+void dimming(byte pwm) {
+  led1.setLedOutputMode(TLC59108::LED_MODE::PWM_INDGRP);
+  led2.setLedOutputMode(TLC59108::LED_MODE::PWM_INDGRP);
+  led1.setRegister(TLC59108::REGISTER::GRPPWM::ADDR, pwm);
+  led2.setRegister(TLC59108::REGISTER::GRPPWM::ADDR, pwm);
+}
+
+void disable_dimming() {
+  led1.setLedOutputMode(TLC59108::LED_MODE::PWM_IND);
+  led2.setLedOutputMode(TLC59108::LED_MODE::PWM_IND);
+}
+
 /* ** Serial Buffer Format **
 
   Serial buffer commands consist of one command per line, 
@@ -79,6 +91,15 @@ void bsColor(byte sw, bool state, byte r, byte g, byte b) {
   	with 
   	  <switch> as a number between 1 and 4 denoting the switch
   	  <red> <green> <blue> as three digit decimal color values 0 - 255
+  
+  2) DIM: Set Dimming
+  
+    DIM [<brightness>]
+    
+    with
+      <brightness> as three digit decimal color values 0 - 255
+    
+    If brightness is not provided, dimming is disabled.
 */
 
 
@@ -139,7 +160,8 @@ char* getSerialArg(int idx) {
 void processSerialCommand() {
   if (strcmp("COL\0", serialBuffer) == 0)
     processCOL(); 
-  
+  else if (strcmp("DIM\0", serialBuffer) == 0)
+    processDIM(); 
   else
     Serial.write("Unknown command!\n")  ;
 }
@@ -162,6 +184,22 @@ void processCOL() {
   byte b = nnn(getSerialArg(3));
 
   swColor(sw, r, g, b);
+
+  Serial.write("OK\n");
+}
+
+void processDIM() {
+  if (numArgs == 0) {
+    disable_dimming();
+  }
+  if (numArgs != 1) {
+    Serial.write("DIM can only handle up to one argument: <brightness>!\n");
+    return;
+  }
+
+  byte pwm = (byte) String(getSerialArg(0)).toInt();
+
+  dimming(pwm);
 
   Serial.write("OK\n");
 }
