@@ -14,7 +14,7 @@ def find_arduino():
 
 def main():
     if len(sys.argv) != 2:
-        print("Must have two arguments: <dim>")
+        print("Must have one argument: <dim>")
         sys.exit(-1)
 
     dim = int(sys.argv[1])
