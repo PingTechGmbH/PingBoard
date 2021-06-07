@@ -33,6 +33,7 @@ def main():
     ser = serial.Serial(port.device, 115200, timeout=1)
     ser.write(cmd_string.encode())
     res = ser.readline().decode()
+    ser.flush()
     ser.close()
 
     if not res == "OK\n":
