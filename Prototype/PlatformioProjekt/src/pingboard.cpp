@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "TLC59108.h"
 #include "Keyboard.h"
 #include "InputDebounce.h"
@@ -27,6 +28,8 @@ static int KEY_SPEC[4] = {KEY_F9,
                           KEY_F10,
                           KEY_F11,
                           KEY_F12};
+
+static byte swColorBuffer[4][3] = {};
 
 // 0 - K1 RED
 // 1 - K1 GREEN
@@ -72,6 +75,87 @@ void disable_dimming() {
   led2.setLedOutputMode(TLC59108::LED_MODE::PWM_IND);
 }
 
+typedef enum {
+  DISABLED=0,
+  ON,
+  OFF,
+  SINGLE
+} blink_mode_t;
+
+class BlinkSwitch {
+    private:
+        blink_mode_t m_mode;
+        unsigned long m_time; // last time for delay
+        unsigned long m_on_time;  // how long the led should be turned on
+        unsigned long m_off_time; // how long the led should be turned off
+        byte m_switch;  // switch no. 1-4
+        byte m_r;
+        byte m_g;
+        byte m_b;
+    public:
+        BlinkSwitch()
+          : m_mode(DISABLED)
+          , m_time(0)
+          , m_on_time(0)
+          , m_off_time(0)
+          , m_switch(1)
+          , m_r(0)
+          , m_g(0)
+          , m_b(0)
+        { }
+        BlinkSwitch(byte sw,
+                    blink_mode_t mode = DISABLED,
+                    unsigned long on_time  = 0,
+                    unsigned long off_time = 0,
+                    byte r = 0,
+                    byte g = 0,
+                    byte b = 0)
+          : m_mode(mode)
+          , m_on_time(on_time)
+          , m_off_time(off_time)
+          , m_switch(sw)
+          , m_r(r)
+          , m_g(g)
+          , m_b(b)
+          {
+            m_time = millis();
+            if (mode == DISABLED){
+              reset();
+            }
+            if (mode == SINGLE) {
+              swColor(m_switch, r, g, b);
+            }
+        }
+        void reset() {
+          swColor(m_switch,
+                  swColorBuffer[m_switch-1][0],
+                  swColorBuffer[m_switch-1][1],
+                  swColorBuffer[m_switch-1][2]);
+        }
+        void process() {
+          unsigned long current = millis();
+          unsigned long delta = abs(current-m_time);
+          
+          if (m_on_time>0 && delta > m_on_time){
+            if (m_mode == SINGLE) {
+              reset();
+              m_mode = DISABLED;
+              m_time = current;
+            }
+          }
+          current %= (m_on_time + m_off_time);
+          if (m_mode == ON && current > m_on_time) {
+            reset();
+            m_mode = OFF;
+          } else if (m_mode == OFF && current <= m_on_time) {
+            swColor(m_switch, m_r, m_g, m_b);
+            m_mode = ON;
+          }
+        }
+};
+
+BlinkSwitch blinking[4];
+
 /* ** Serial Buffer Format **
 
   Serial buffer commands consist of one command per line, 
@@ -100,6 +184,15 @@ void disable_dimming() {
       <brightness> as three digit decimal color values 0 - 255
     
     If brightness is not provided, dimming is disabled.
+
+  3) BLNK: Set Blinking
+
+    BLNK <switch> <mode> <red> <green> <blue>
+    
+    with 
+  	  <switch> as a number between 1 and 4 denoting the switch
+      <mode> as one of SINGLE, SHORT, LONG, OFF
+  	  <red> <green> <blue> as three digit decimal color values 0 - 255
 */
 
 
@@ -110,6 +203,15 @@ static int serialBufferPos = 0;
 #define SERIAL_MAX_ARGS 10
 static int serialArgIdx[SERIAL_MAX_ARGS];
 static int numArgs = 0;
+
+void parseSerialBuffer();
+void processSerialCommand();
+void processCOL();
+void processDIM();
+void processBLNK();
+int n(char* c);
+int nnn(char* c);
+void trigger_keypress(int idx);
 
 void checkSerial() {
   if (Serial.available()) {
@@ -162,6 +264,8 @@ void processSerialCommand() {
     processCOL(); 
   else if (strcmp("DIM\0", serialBuffer) == 0)
     processDIM(); 
+  else if (strcmp("BLNK\0", serialBuffer) == 0)
+    processBLNK(); 
   else
     Serial.write("Unknown command!\n")  ;
 }
@@ -184,6 +288,9 @@ void processCOL() {
   byte b = nnn(getSerialArg(3));
 
   swColor(sw, r, g, b);
+  swColorBuffer[sw-1][0] = r;
+  swColorBuffer[sw-1][1] = g;
+  swColorBuffer[sw-1][2] = b;
 
   Serial.write("OK\n");
 }
@@ -202,6 +309,45 @@ void processDIM() {
   dimming(pwm);
 
   Serial.write("OK\n");
+}
+
+void processBLNK() {
+  if (numArgs != 5) {
+    Serial.write("BLNK requires 4 arguments: <switch> <mode> <red> <green> <blue>!\n");
+    return;
+  }
+  byte sw = n(getSerialArg(0));
+
+  if ((sw < 1) || (sw > 4)) {
+    Serial.write("Switch number must be between 1 and 4.\n");
+    return;
+  }
+  char* mode_str = getSerialArg(1);
+
+  byte r = (byte) String(getSerialArg(2)).toInt();
+  byte g = (byte) String(getSerialArg(3)).toInt();
+  byte b = (byte) String(getSerialArg(4)).toInt();
+
+  // use 1 Hz for slow and 4 Hz for short blinks as NASA suggests
+  // https://colorusage.arc.nasa.gov/flashing.php
+
+  const unsigned long SHORT_MS = 250;
+  const unsigned long LONG_MS = 1000;
+
+  if (strcmp("SINGLE\0", mode_str) == 0) {
+    blinking[sw-1] = BlinkSwitch(sw, SINGLE, LONG_MS, LONG_MS, r, g, b);
+  } else if (strcmp("SHORT\0", mode_str) == 0) {
+    blinking[sw-1] = BlinkSwitch(sw, ON, SHORT_MS, SHORT_MS, r, g, b);
+  } else if (strcmp("LONG\0", mode_str) == 0) {
+    blinking[sw-1] = BlinkSwitch(sw, ON, LONG_MS, LONG_MS, r, g, b);
+  } else if (strcmp("OFF\0", mode_str) == 0) {
+    blinking[sw-1] = BlinkSwitch(sw);
+  } else {
+    Serial.write("Mode must be one of SINGLE, SHORT, LONG, OFF.\n");
+    return;
+  }
+  Serial.write("OK\n");
+  return;
 }
 
 void button_pressed_callback(uint8_t pinIn) { 
@@ -264,10 +410,9 @@ void loop(){
 
   checkSerial();
 
-  delay(1);
+  for(int i = 0; i < 4; ++i){
+    blinking[i].process();
+  }
 
-//  bsColor(1, button_state[0], 95, 0, 0);
-//  bsColor(2, button_state[1], 24, 197, 110);
-//  bsColor(3, button_state[2], 25, 75, 255);
-//  bsColor(4, button_state[3], 156, 131, 7);
+  delay(1);
 }
