@@ -1,6 +1,6 @@
 # PingBoard
 
-Mini keyboard for PingTech with just four keys for core macros.
+> Mini keyboard with just four keys for core macros.
 
 ## Platform.io
 
