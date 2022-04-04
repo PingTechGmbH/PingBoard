@@ -28,3 +28,7 @@ After doing this (or a reboot), you can then flash the firmware with:
 cd Prototype/PlatformioProjekt
 platformio run -t upload
 ```
+
+## License
+
+This project is published under the MIT license, see [LICENSE](LICENSE.txt) for details.
