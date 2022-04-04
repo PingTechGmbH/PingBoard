@@ -2,6 +2,8 @@
 
 > Mini keyboard with just four keys for core macros.
 
+![](Prototype/pingboard.jpeg)
+
 ## Building the firmware
 
 ### with Platform.io
