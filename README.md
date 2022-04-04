@@ -2,7 +2,9 @@
 
 > Mini keyboard with just four keys for core macros.
 
-## Platform.io
+## Building the firmware
+
+### with Platform.io
 
 Install platformio with
 
