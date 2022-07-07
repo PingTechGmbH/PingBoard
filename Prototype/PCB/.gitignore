@@ -9,6 +9,7 @@
 *.sch-bak
 *~
 _autosave-*
+*-backups/
 *.tmp
 *-save.pro
 *-save.kicad_pcb
@@ -26,3 +27,6 @@ sym-lib-table
 # Exported BOM files
 *.xml
 *.csv
+
+# Local Project Settings
+*.kicad_prl
