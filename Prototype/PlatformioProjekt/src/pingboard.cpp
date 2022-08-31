@@ -368,13 +368,38 @@ void trigger_keypress(int idx) {
   Keyboard.releaseAll();
 }
 
+void setTestColor(int r, int g, int b) {
+  for (int sw = 1; sw <= 4; sw++)
+    swColor(sw, r, g, b);
+}
+
+void playLedTestPattern() {
+  dimming(255);
+  setTestColor(255, 0, 0);
+  delay(500);
+  setTestColor(0, 255, 0);
+  delay(500);
+  setTestColor(0, 0, 255);
+  delay(500);
+  setTestColor(255, 255, 255);
+  delay(500);
+  for (int d = 255; d > 0; d-=8) {
+    dimming(d);
+    delay(10);
+  }
+  setTestColor(0, 0, 0);
+  dimming(255);
+}
+
+
 void setup() {
   // LED setup
   Wire.begin();
   led1.init(HW_RESET_PIN);
   led1.setLedOutputMode(TLC59108::LED_MODE::PWM_IND);
-  led2.init();
+  led2.init(HW_RESET_PIN);
   led2.setLedOutputMode(TLC59108::LED_MODE::PWM_IND);
+  playLedTestPattern();
 
   // KEYBOARD setup
   Keyboard.begin();
