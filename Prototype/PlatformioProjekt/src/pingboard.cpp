@@ -397,7 +397,14 @@ void setup() {
   Wire.begin();
   led1.init(HW_RESET_PIN);
   led1.setLedOutputMode(TLC59108::LED_MODE::PWM_IND);
-  led2.init(HW_RESET_PIN);
+  /*
+   * Do not hardware-reset the second LED, as this will destroy
+   * initialization of the first LED.
+   * The reset pins are connected and thus need to be triggered only
+   * once.
+   * However, the rest of the initialization procedure is still needed!
+   */
+  led2.init(0);
   led2.setLedOutputMode(TLC59108::LED_MODE::PWM_IND);
   playLedTestPattern();
 
